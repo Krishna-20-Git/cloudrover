@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CloudRover | Local Surveillance Console</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><div class="mark">CR</div><div><div class="eyebrow">LOCAL-FIRST TELEPRESENCE</div><h1>CloudRover <span>Console</span></h1></div></div>
+    <div class="top-meta"><span class="pill"><i id="mqttDot" class="dot"></i><span id="mqttText">MQTT connecting</span></span><span class="mode">LOCAL MODE</span></div>
+  </header>
+  <main>
+    <section class="hero">
+      <div><div class="eyebrow">SURVEILLANCE / FIELD INSPECTION</div><h2>Observe. Navigate. Record.</h2><p>A local dashboard for rover commands, camera preview, and timestamped visual evidence.</p></div>
+      <div class="hero-badge"><span class="pulse"></span> LOCAL NETWORK CONSOLE</div>
+    </section>
+    <section class="stats">
+      <article class="stat"><span>ROVER LINK</span><strong id="roverStatus">Waiting</strong><small id="lastSeen">No status packet received</small></article>
+      <article class="stat"><span>CAMERA</span><strong id="cameraStatus">Not configured</strong><small id="cameraHint">Connect ESP32-CAM later</small></article>
+      <article class="stat"><span>ULTRASONIC</span><strong id="distance">Not connected</strong><small id="sensorHint">No live distance reading</small></article>
+      <article class="stat"><span>VISUAL EVIDENCE</span><strong id="frameCount">0 frames</strong><small>Saved on this computer</small></article>
+    </section>
+    <section class="layout">
+      <article class="panel camera-panel">
+        <div class="panel-head"><div><div class="eyebrow">01 / LIVE VIEW</div><h3>Rover camera</h3></div><span class="status-tag" id="cameraTag">OFFLINE</span></div>
+        <div class="camera-stage" id="cameraStage">
+          <div class="camera-placeholder" id="cameraPlaceholder"><div class="camera-icon">▣</div><h4>Camera not connected</h4><p>The rover currently has no ESP32-CAM. The live view will activate after you configure its stream URL.</p></div>
+          <img id="cameraImage" alt="Rover camera stream" hidden>
+          <div class="camera-overlay"><span>● LIVE FEED</span><span id="clock">--:--:--</span></div>
+        </div>
+        <div class="capture-row"><input id="sessionName" value="inspection-01" aria-label="Inspection session name"><input id="frameLabel" placeholder="Frame note (e.g. corridor entrance)" aria-label="Frame note"><button id="captureBtn" class="primary" disabled>Capture frame</button></div>
+        <p class="hint" id="captureHint">Capture is disabled until a camera stream is available.</p>
+      </article>
+      <article class="panel control-panel">
+        <div class="panel-head"><div><div class="eyebrow">02 / TELEOPERATION</div><h3>Rover controls</h3></div><span class="status-tag">MQTT</span></div>
+        <div class="control-warning" id="controlWarning">Commands are disabled until the local MQTT broker connects.</div>
+        <div class="dpad">
+          <span></span><button data-command="forward" aria-label="Forward">▲</button><span></span>
+          <button data-command="left" aria-label="Left">◀</button><button data-command="stop" class="stop" aria-label="Stop">■</button><button data-command="right" aria-label="Right">▶</button>
+          <span></span><button data-command="reverse" aria-label="Reverse">▼</button><span></span>
+        </div>
+        <div class="speed-head"><label for="speed">Motor speed</label><strong id="speedValue">180 / 255</strong></div>
+        <input id="speed" type="range" min="0" max="255" value="180">
+        <button id="setSpeed" class="secondary">Apply speed</button>
+        <p class="hint">Use the STOP control at any time. The rover firmware must also enforce its own command timeout.</p>
+      </article>
+    </section>
+    <section class="layout lower">
+      <article class="panel">
+        <div class="panel-head"><div><div class="eyebrow">03 / EVIDENCE LIBRARY</div><h3>Captured frames</h3></div><span class="count" id="libraryCount">0</span></div>
+        <div id="gallery" class="gallery"><div class="empty">No frames saved yet. Captured images will appear here with timestamps.</div></div>
+      </article>
+      <article class="panel">
+        <div class="panel-head"><div><div class="eyebrow">04 / SESSION TIMELINE</div><h3>Recent events</h3></div><button id="clearEvents" class="text-button">Clear view</button></div>
+        <div id="timeline" class="timeline"><div class="empty">Waiting for MQTT, rover status, and capture events.</div></div>
+      </article>
+    </section>
+    <footer><span>CLOUDROVER / LOCAL-FIRST ARCHITECTURE</span><span>Frames and metadata are stored on this host computer.</span></footer>
+  </main>
+  <div id="toast" role="status"></div>
+  <script src="/app.js"></script>
+</body>
+</html>
